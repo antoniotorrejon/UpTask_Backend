@@ -1,18 +1,16 @@
 import { CorsOptions } from 'cors';
-import dotenv from 'dotenv';
-dotenv.config();
- 
+
 export const corsConfig: CorsOptions = {
-    origin: function (origin, callback) {
-        const whiteList = [process.env.FRONTEND_URL];
-    
-        if (process.argv[2] == '--api') {
-        whiteList.push(undefined);
+    origin: (origin, callback) => {
+        const whitelist = [process.env.FRONTEND_URL];
+        if (process.argv[2] === '--api') {
+            whitelist.push(undefined, null); // Permitir solicitudes sin origen (Postman, etc.)
         }
-        if (whiteList.includes(origin)) {
-        callback(null, true);
+
+        if (!origin || whitelist.includes(origin)) {
+            callback(null, true); // Permitir acceso
         } else {
-        callback(new Error('Error de CORS'));
+            callback(new Error('Error de CORS: origen no permitido')); // Bloquear acceso
         }
     },
 };
